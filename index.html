@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotaKu - Aplikasi Catatan Digital</title>
+    <!-- PWA Meta Tags & Dynamic Icons -->
+    <meta name="description" content="Aplikasi catatan digital pribadi cerdas dengan integrasi Gemini AI dan dukungan offline.">
+    <meta name="theme-color" content="#eab308">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NotaKu">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#fefce8',
+                            100: '#fef9c3',
+                            200: '#fef08a',
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#d97706',
+                            700: '#b45309',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans transition-colors duration-200 antialiased selection:bg-primary-500 selection:text-white">
+
+    <!-- Container Utama -->
+    <div class="min-h-screen flex flex-col md:flex-row overflow-hidden">
+        
+        <!-- Sidebar Navigasi (Desktop & Mobile Drawer) -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
+            <!-- Header Sidebar -->
+            <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <!-- Ikon Aplikasi NotaKu (Squircle Emas, Buku Spiral "N", Stylus & AI Sparkles) -->
+                    <div class="w-10 h-10 rounded-xl shadow-md shadow-amber-500/25 overflow-hidden shrink-0">
+                        <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg" aria-label="Logo NotaKu">
+                            <defs>
+                                <linearGradient id="notakuBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#fde047"/>
+                                    <stop offset="50%" stop-color="#eab308"/>
+                                    <stop offset="100%" stop-color="#d97706"/>
+                                </linearGradient>
+                                <linearGradient id="penBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#334155"/>
+                                    <stop offset="100%" stop-color="#0f172a"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- Dasar Squircle Emas -->
+                            <rect width="120" height="120" rx="28" fill="url(#notakuBg)"/>
+                            <!-- Tumpukan Kertas Catatan -->
+                            <rect x="27" y="31" width="56" height="68" rx="9" fill="#cbd5e1"/>
+                            <rect x="25" y="28" width="56" height="68" rx="9" fill="#e2e8f0"/>
+                            <rect x="23" y="25" width="56" height="68" rx="9" fill="#ffffff"/>
+                            <!-- Ring Spiral Emas -->
+                            <g fill="none" stroke="#b45309" stroke-width="3.5" stroke-linecap="round">
+                                <path d="M32 20 v9"/>
+                                <path d="M41 20 v9"/>
+                                <path d="M50 20 v9"/>
+                                <path d="M59 20 v9"/>
+                                <path d="M68 20 v9"/>
+                            </g>
+                            <!-- Inisial N & Garis Catatan -->
+                            <text x="32" y="51" font-family="Georgia, serif" font-weight="bold" font-size="22" fill="#78350f">N</text>
+                            <rect x="54" y="38" width="17" height="3.5" rx="1.75" fill="#94a3b8"/>
+                            <rect x="54" y="45" width="13" height="3.5" rx="1.75" fill="#cbd5e1"/>
+                            <rect x="32" y="60" width="38" height="3.5" rx="1.75" fill="#cbd5e1"/>
+                            <rect x="32" y="68" width="28" height="3.5" rx="1.75" fill="#cbd5e1"/>
+                            <rect x="32" y="76" width="22" height="3.5" rx="1.75" fill="#e2e8f0"/>
+                            <!-- Kilauan AI Sparkles -->
+                            <path d="M84 18 L86.5 24.5 L93 27 L86.5 29.5 L84 36 L81.5 29.5 L75 27 L81.5 24.5 Z" fill="#fef9c3"/>
+                            <path d="M97 32 L98.5 36 L102.5 37.5 L98.5 39 L97 43 L95.5 39 L91.5 37.5 L95.5 36 Z" fill="#fef08a"/>
+                            <!-- Pena Stylus Cerdas -->
+                            <g transform="translate(86, 52) rotate(38)">
+                                <rect x="-5.5" y="-26" width="11" height="44" rx="5.5" fill="url(#penBody)"/>
+                                <rect x="-5.5" y="-16" width="11" height="3" fill="#facc15"/>
+                                <rect x="-2" y="-6" width="4" height="12" rx="2" fill="#facc15"/>
+                                <polygon points="-5.5,18 5.5,18 0,29" fill="#eab308"/>
+                                <circle cx="0" cy="30" r="3.5" fill="#fef9c3" opacity="0.9"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-amber-600 to-yellow-500 dark:from-yellow-400 dark:to-amber-300 bg-clip-text text-transparent">NotaKu</h1>
+                        <p class="text-[11px] text-slate-400 font-medium">Catatan Digital + AI</p>
+                    </div>
+                </div>
+                <button id="closeSidebarBtn" class="md:hidden p-2 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Tombol Buat Catatan Baru & AI -->
+            <div class="p-4 space-y-2">
+                <button id="newNoteBtn" class="w-full py-3 px-4 bg-primary-500 hover:bg-primary-600 active:scale-[0.98] text-slate-950 font-semibold rounded-xl shadow-sm shadow-primary-500/30 flex items-center justify-center gap-2 transition-all">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>Catatan Baru</span>
+                </button>
+                <button id="aiMagicNoteBtn" class="w-full py-2.5 px-4 bg-gradient-to-r from-amber-500/15 via-yellow-500/15 to-orange-500/15 hover:from-amber-500/25 hover:to-orange-500/25 border border-primary-300/80 dark:border-primary-500/30 active:scale-[0.98] text-amber-800 dark:text-primary-300 font-medium text-sm rounded-xl flex items-center justify-center gap-2 transition-all">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-primary-600 dark:text-primary-400"></i>
+                    <span>Buat Catatan AI</span>
+                </button>
+            </div>
+
+            <!-- Menu Filter -->
+            <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+                <div class="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu Utama</div>
+                
+                <button data-filter="all" class="filter-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="files" class="w-4 h-4"></i>
+                        <span>Semua Catatan</span>
+                    </div>
+                    <span id="count-all" class="text-xs px-2 py-0.5 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-sm">0</span>
+                </button>
+
+                <button data-filter="pinned" class="filter-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="pin" class="w-4 h-4"></i>
+                        <span>Disematkan</span>
+                    </div>
+                    <span id="count-pinned" class="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">0</span>
+                </button>
+
+                <div class="pt-4 px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Kategori</div>
+                
+                <button data-filter="Pribadi" class="filter-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="user" class="w-4 h-4 text-emerald-500"></i>
+                        <span>Pribadi</span>
+                    </div>
+                    <span id="count-Pribadi" class="text-xs text-slate-400">0</span>
+                </button>
+
+                <button data-filter="Pekerjaan" class="filter-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="briefcase" class="w-4 h-4 text-blue-500"></i>
+                        <span>Pekerjaan</span>
+                    </div>
+                    <span id="count-Pekerjaan" class="text-xs text-slate-400">0</span>
+                </button>
+
+                <button data-filter="Ide" class="filter-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i>
+                        <span>Ide & Kreatif</span>
+                    </div>
+                    <span id="count-Ide" class="text-xs text-slate-400">0</span>
+                </button>
+
+            <!-- Footer Sidebar (Tema & Info PWA) -->
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
+                <button id="installPwaBtn" class="hidden w-full py-2 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/50 text-amber-800 dark:text-primary-300 text-xs font-semibold items-center justify-center gap-2 transition-all">
+                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                    <span>Instal Aplikasi Android</span>
+                </button>
+                <div class="flex items-center justify-between gap-2">
+                    <button id="openPwaModalBtn" class="flex-1 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium flex items-center gap-2 transition-colors" title="Status PWA, Ikon & Service Worker">
+                        <span id="swStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span class="truncate">PWA & Ikon App</span>
+                    </button>
+                    <button id="themeToggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="Ganti Tema">
+                        <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+                        <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay Gelap untuk Mobile Sidebar -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-30 hidden md:hidden"></div>
+
+        <!-- Area Konten Utama -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden">
+            
+            <!-- Topbar: Pencarian & Navigasi Mobile -->
+            <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3.5 flex items-center justify-between gap-3 sticky top-0 z-20">
+                <div class="flex items-center gap-3 flex-1 max-w-xl">
+                    <button id="openSidebarBtn" class="md:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    
+                    <!-- Input Pencarian -->
+                    <div class="relative flex-1">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="searchInput" placeholder="Cari judul atau isi catatan..." 
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-100 dark:bg-slate-800/80 border border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl text-sm outline-none transition-all placeholder:text-slate-400">
+                    </div>
+                </div>
+
+                <!-- Pilihan Urutan -->
+                <div class="flex items-center gap-2">
+                    <select id="sortSelect" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-medium px-3 py-2.5 rounded-xl border-none outline-none cursor-pointer">
+                        <option value="newest">Terbaru</option>
+                        <option value="oldest">Terlama</option>
+                        <option value="az">Judul (A-Z)</option>
+                    </select>
+                </div>
+            </header>
+
+            <!-- Daftar Catatan (Grid) -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <!-- Judul Bagian -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 id="currentViewTitle" class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Semua Catatan</h2>
+                            <p id="currentViewSubtitle" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">Kelola ide dan catatan harian Anda di satu tempat</p>
+                        </div>
+                        <div class="flex items-center gap-2 md:hidden">
+                            <button id="mobileAiNoteBtn" class="p-3 bg-primary-100 dark:bg-primary-500/20 text-primary-700 dark:text-primary-300 rounded-xl" title="Buat Catatan AI">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </button>
+                            <button id="mobileNewNoteBtn" class="p-3 bg-primary-500 text-slate-950 rounded-xl shadow-lg shadow-primary-500/30" title="Catatan Baru">
+                                <i data-lucide="plus" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Grid Kartu Catatan -->
+                    <div id="notesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                        <!-- Kartu catatan akan dirender oleh JavaScript -->
+                    </div>
+
+                    <!-- Tampilan Kosong (Empty State) -->
+                    <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
+                        <div class="w-20 h-20 rounded-2xl bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-400 mb-4">
+                            <i data-lucide="file-text" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200">Belum ada catatan</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 max-w-xs mt-1 mb-6">Mulai tulis ide, daftar tugas, atau ringkasan penting Anda sekarang.</p>
+                        <button onclick="openEditor()" class="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-slate-950 text-sm font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Buat Catatan Pertama</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Editor Catatan -->
+    <div id="editorModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            
+            <!-- Toolbar Editor -->
+            <div class="px-4 sm:px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 bg-slate-50/50 dark:bg-slate-900/50">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <!-- Pilih Kategori -->
+                    <select id="noteCategory" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg outline-none focus:border-primary-500">
+                        <option value="Pribadi">🟢 Pribadi</option>
+                        <option value="Pekerjaan">🔵 Pekerjaan</option>
+                        <option value="Ide">🟡 Ide & Kreatif</option>
+                        <option value="Belajar">🟣 Belajar</option>
+                    </select>
+
+                    <!-- Tombol Pin -->
+                    <button id="togglePinBtn" type="button" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Sematkan Catatan">
+                        <i data-lucide="pin" class="w-4 h-4"></i>
+                    </button>
+
+                    <!-- Tombol Salin -->
+                    <button id="copyNoteBtn" type="button" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Salin Teks">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+
+                    <!-- Tombol Unduh TXT -->
+                    <button id="downloadNoteBtn" type="button" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Unduh sebagai .txt">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="deleteNoteBtn" type="button" class="hidden p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors" title="Hapus Catatan">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                    <button id="closeEditorBtn" type="button" class="px-4 py-1.5 bg-primary-500 hover:bg-primary-600 text-slate-950 text-sm font-semibold rounded-lg shadow-xs transition-colors">
+                        Selesai
+                    </button>
+                </div>
+            </div>
+
+            <!-- Toolbar Gemini AI -->
+            <div class="px-4 sm:px-6 py-2.5 border-b border-amber-200/70 dark:border-slate-800 bg-gradient-to-r from-amber-50/80 via-yellow-50/50 to-transparent dark:from-primary-500/10 dark:via-slate-900 dark:to-slate-900">
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-primary-400 mr-1 shrink-0">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        Gemini AI:
+                    </span>
+                    <button type="button" data-ai-action="summarize" class="ai-action-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-primary-400 hover:text-amber-700 dark:hover:text-primary-300 transition-all">
+                        Ringkas
+                    </button>
+                    <button type="button" data-ai-action="polish" class="ai-action-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-primary-400 hover:text-amber-700 dark:hover:text-primary-300 transition-all">
+                        Rapikan Teks
+                    </button>
+                    <button type="button" data-ai-action="continue" class="ai-action-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-primary-400 hover:text-amber-700 dark:hover:text-primary-300 transition-all">
+                        Lanjutkan
+                    </button>
+                    <button type="button" data-ai-action="todos" class="ai-action-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-primary-400 hover:text-amber-700 dark:hover:text-primary-300 transition-all">
+                        Ekstrak To-Do
+                    </button>
+                    <button type="button" data-ai-action="autotitle" class="ai-action-btn shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-primary-400 hover:text-amber-700 dark:hover:text-primary-300 transition-all">
+                        Judul & Kategori
+                    </button>
+                    <button type="button" id="toggleCustomPromptBtn" class="shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary-500/15 text-amber-800 dark:text-primary-300 border border-primary-400/50 hover:bg-primary-500/25 transition-all flex items-center gap-1">
+                        <i data-lucide="wand-2" class="w-3 h-3"></i>
+                        <span>Perintah Kustom</span>
+                    </button>
+                </div>
+
+                <!-- Input Prompt Kustom AI -->
+                <div id="aiCustomPromptBar" class="hidden mt-2.5 flex items-center gap-2">
+                    <input type="text" id="aiCustomPromptInput" placeholder="Minta Gemini menulis atau mengolah catatan (misal: Buatkan rangkuman materi IoT)..." 
+                        class="flex-1 px-3 py-2 text-xs sm:text-sm bg-white dark:bg-slate-800 border border-amber-300 dark:border-slate-700 rounded-xl outline-none focus:border-primary-500 text-slate-800 dark:text-slate-100">
+                    <button type="button" id="sendCustomPromptBtn" class="px-3.5 py-2 bg-primary-500 hover:bg-primary-600 text-slate-950 font-semibold text-xs sm:text-sm rounded-xl transition-colors flex items-center gap-1.5 shrink-0">
+                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                        <span>Kirim</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Judul & Isi -->
+            <div class="flex-1 flex flex-col p-4 sm:p-6 overflow-y-auto">
+                <!-- Indikator Loading AI -->
+                <div id="aiLoadingIndicator" class="hidden mb-4 p-3.5 rounded-xl bg-amber-50 dark:bg-primary-500/10 border border-amber-200 dark:border-primary-500/30 flex items-center gap-3 text-xs sm:text-sm text-amber-800 dark:text-primary-300">
+                    <div class="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin shrink-0"></div>
+                    <span id="aiLoadingText" class="font-medium">Gemini AI sedang memproses catatan Anda...</span>
+                </div>
+
+                <!-- Kotak Pratinjau Hasil Gemini AI -->
+                <div id="aiPreviewBox" class="hidden mb-4 rounded-2xl border border-amber-300/90 dark:border-primary-500/40 bg-amber-50/70 dark:bg-slate-800/90 p-4 shadow-sm">
+                    <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-amber-200/70 dark:border-slate-700">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-primary-300">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-primary-500"></i>
+                            Hasil Gemini AI
+                        </span>
+                        <button type="button" id="dismissAiPreviewBtn" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                            Tutup
+                        </button>
+                    </div>
+                    <div id="aiPreviewContent" class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 whitespace-pre-line leading-relaxed max-h-48 overflow-y-auto mb-3"></div>
+                    <div class="flex items-center justify-end gap-2 flex-wrap">
+                        <button type="button" id="appendAiResultBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors">
+                            + Sisipkan di Bawah
+                        </button>
+                        <button type="button" id="replaceAiResultBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary-500 hover:bg-primary-600 text-slate-950 transition-colors">
+                            Ganti Isi Catatan
+                        </button>
+                    </div>
+                </div>
+
+                <input type="text" id="noteTitle" placeholder="Judul Catatan..." 
+                    class="w-full text-xl sm:text-2xl font-bold bg-transparent border-none outline-none placeholder:text-slate-300 dark:placeholder:text-slate-600 mb-4 text-slate-800 dark:text-white">
+                
+                <textarea id="noteContent" placeholder="Mulai mengetik catatan Anda di sini..." 
+                    class="w-full flex-1 min-h-[250px] sm:min-h-[320px] resize-none bg-transparent border-none outline-none text-sm sm:text-base leading-relaxed text-slate-700 dark:text-slate-300 placeholder:text-slate-300 dark:placeholder:text-slate-600"></textarea>
+            </div>
+
+            <!-- Footer Status Editor -->
+            <div class="px-4 sm:px-6 py-2.5 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between text-xs text-slate-400">
+                <span id="saveStatus" class="flex items-center gap-1.5">
+                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i>
+                    Tersimpan otomatis
+                </span>
+                <span id="wordCount">0 kata • 0 karakter</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus (Pengganti confirm()) -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+        <div class="bg-white dark:bg-slate-900 max-w-sm w-full rounded-2xl p-6 shadow-xl border border-slate-200 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-500/10 text-rose-600 flex items-center justify-center mb-4">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white">Hapus Catatan?</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-6">Catatan yang dihapus tidak dapat dikembalikan lagi.</p>
+            <div class="flex items-center justify-end gap-3">
+                <button id="cancelDeleteBtn" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Batal</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 rounded-xl text-sm font-medium bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-colors">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal PWA Manifest, Service Worker & Ekspor Ikon -->
+    <div id="pwaModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+        <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <img id="pwaIconPreview" alt="Ikon Aplikasi NotaKu" class="w-12 h-12 rounded-2xl shadow-md">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-white">PWA & Ikon Android NotaKu</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Siap diinstal ke layar utama Android</p>
+                    </div>
+                </div>
+                <button id="closePwaModalBtn" class="p-2 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2.5 mb-5 text-xs">
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 flex items-center justify-between">
+                    <span class="font-medium text-slate-600 dark:text-slate-300">Web App Manifest</span>
+                    <span id="manifestStatusBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400 font-semibold">Aktif</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 flex items-center justify-between">
+                    <span class="font-medium text-slate-600 dark:text-slate-300">Service Worker (Offline)</span>
+                    <span id="swStatusBadge" class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300 font-semibold">Memeriksa...</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                Anda dapat langsung memasang aplikasi lewat menu <strong>Chrome Android (⋮ → Tambahkan ke layar utama)</strong>, atau mengunduh aset di bawah jika ingin membuat file <code>.apk</code>:
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+                <button id="downloadIconBtn" class="py-2.5 px-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-slate-950 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors">
+                    <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                    <span>Ikon PNG</span>
+                </button>
+                <button id="downloadManifestBtn" class="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors">
+                    <i data-lucide="file-json" class="w-3.5 h-3.5"></i>
+                    <span>manifest.json</span>
+                </button>
+                <button id="downloadSwBtn" class="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors">
+                    <i data-lucide="cog" class="w-3.5 h-3.5"></i>
+                    <span>sw.js</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifikasi -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-800 dark:bg-slate-700 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-sm font-medium">
+            <i data-lucide="info" class="w-4 h-4 text-primary-400"></i>
+            <span id="toastMessage">Pesan notifikasi</span>
+        </div>
+    </div>
+
+    <script>
+        // --- State Aplikasi ---
+        let notes = [];
+        let activeNoteId = null;
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let sortBy = 'newest';
+        let noteToDeleteId = null;
+
+        // Warna badge kategori
+        const categoryColors = {
+            'Pribadi': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
+            'Pekerjaan': 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400',
+            'Ide': 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400',
+            'Belajar': 'bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400'
+        };
+
+        // --- Inisialisasi ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initPWA();
+            const isImported = loadNotes();
+            lucide.createIcons();
+            setupEventListeners();
+            renderNotes();
+            if (isImported) {
+                showToast('4 catatan materi Smart Agriculture berhasil ditambahkan!');
+            }
+        });
+
+        // --- Manajemen Tema (Dark/Light Mode) ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('notaku_theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('notaku_theme', isDark ? 'dark' : 'light');
+        }
+
+        // --- Penyimpanan Data (LocalStorage) ---
+        function loadNotes() {
+            let newlyImported = false;
+            try {
+                const saved = localStorage.getItem('notaku_notes');
+                if (saved) {
+                    notes = JSON.parse(saved);
+                } else {
+                    // Catatan sambutan default
+                    notes = [
+                        {
+                            id: 'welcome-note',
+                            title: 'Selamat Datang di NotaKu! 👋',
+                            content: 'Ini adalah aplikasi catatan digital pribadi Anda.\n\nFitur yang tersedia:\n• Penyimpanan otomatis langsung di browser Anda\n• Pencarian cepat berdasarkan judul dan isi\n• Pengelompokan berdasarkan kategori (Pribadi, Pekerjaan, Ide, Belajar)\n• Sematkan catatan penting agar selalu di atas\n• Ekspor catatan ke format .txt atau salin ke clipboard\n• Dukungan Mode Gelap (Dark Mode)\n\nKlik kartu ini untuk mulai mengedit atau klik tombol "Catatan Baru"!',
+                            category: 'Pribadi',
+                            pinned: false,
+                            updatedAt: Date.now() - 10000
+                        }
+                    ];
+                }
+
+                // Tambahkan catatan ringkasan dari PPT 5 Integrasi AI IoT Cloud
+                if (!localStorage.getItem('notaku_ppt5_imported')) {
+                    const now = Date.now();
+                    const ppt5Notes = [
+                        {
+                            id: 'ppt5-overview-m13-16',
+                            title: 'Smart Agriculture: Integrasi AI, IoT, Cloud & Dashboard (Minggu 13–16)',
+                            content: 'MATA KULIAH: Smart Agriculture & Precision Farming\nStudi Kasus: Monitoring dan irigasi tanaman cabai/hortikultura.\n\nPETA PEMBELAJARAN MINGGU 13–16:\n• Minggu 13 (C3–C4): AI for Smart Agriculture — Analisis & prediksi pertanian.\n• Minggu 14 (C6): Integrated Smart Agriculture System — Integrasi IoT, Cloud, AI, Data, Dashboard.\n• Minggu 15 (C5): System Evaluation & Sustainability — Evaluasi performa, efisiensi, skalabilitas & maintenance.\n• Minggu 16 (C5–C6): Final Project Presentation — Demonstrasi dan pertanggungjawaban prototipe.\n\nCAPAIAN PEMBELAJARAN (CPMK102 & CPMK054):\n• Mengintegrasikan Computing, Cloud, AI, IoT, dan Data menjadi sistem terpadu.\n• Mengembangkan solusi IoT & Embedded System sesuai kebutuhan industri.\n\nALUR SISTEM TERINTEGRASI:\nSensor → ESP32 → Wi-Fi / MQTT → Cloud & Database → AI / Analytics → Dashboard → Decision & Actuator.',
+                            category: 'Belajar',
+                            pinned: true,
+                            updatedAt: now
+                        },
+                        {
+                            id: 'ppt5-minggu13-konsep-ai',
+                            title: 'Minggu 13: Konsep & 4 Pendekatan AI dalam Pertanian',
+                            content: 'KONSEP DASAR:\n• Artificial Intelligence (AI): Sistem komputasi untuk pengenalan pola, prediksi, klasifikasi, dan dukungan keputusan.\n• Machine Learning (ML): Algoritma mempelajari pola dari data (Dataset → Training → Testing).\n• Deep Learning: ML dengan jaringan saraf berlapis (contoh: pengenalan penyakit daun dari citra).\n\n4 PENDEKATAN AI DI PERTANIAN:\n1. Prediction: Memperkirakan kondisi mendatang (kelembapan tanah, kebutuhan air, suhu greenhouse, hasil panen). Algoritma: Linear Regression.\n2. Classification: Mengelompokkan kondisi berdasarkan Soil Moisture:\n   - 0–30%: Kering\n   - 31–60%: Sedang\n   - 61–100%: Basah\n   (Algoritma: Decision Tree, Random Forest).\n3. Anomaly Detection: Mendeteksi data menyimpang dari pola normal (misal kelembapan tiba-tiba turun ke 15% lalu normal lagi → cek kondisi tanah atau gangguan sensor/kabel). Algoritma: Isolation Forest.\n4. Machine Learning (Jenis):\n   - Supervised Learning: Data memiliki label (klasifikasi tanah).\n   - Unsupervised Learning: Data tanpa label (K-Means pengelompokan zona lahan).\n   - Reinforcement Learning: Belajar lewat umpan balik (optimasi strategi penyiraman).\n\nALUR PENGEMBANGAN MODEL AI:\nKumpulkan Data → Simpan Dataset → Cleaning & Preprocessing → Split Train/Test → Training Model → Testing & Evaluasi → Keputusan.',
+                            category: 'Belajar',
+                            pinned: false,
+                            updatedAt: now - 1000
+                        },
+                        {
+                            id: 'ppt5-praktikum13-python',
+                            title: 'Praktikum Minggu 13: Klasifikasi Kelembapan Tanah (Python & Colab)',
+                            content: 'TUJUAN & TOOLS:\nMembangun model Decision Tree untuk klasifikasi kondisi tanah (Kering, Sedang, Basah) menggunakan Google Colab, Python, Pandas, NumPy, dan Scikit-learn.\n\nVARIABEL MODEL:\n• Fitur (X): soil_moisture dan temperature\n• Label (y): condition (Kering, Sedang, Basah)\n\nLANGKAH KODE PYTHON:\n1. Import library: pandas, numpy, train_test_split, DecisionTreeClassifier, accuracy_score, classification_report.\n2. Susun dataset ke dalam pd.DataFrame(data).\n3. Split data latih & uji (70% train, 30% test):\n   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)\n4. Latih model Decision Tree:\n   model = DecisionTreeClassifier(max_depth=3, random_state=42)\n   model.fit(X_train, y_train)\n5. Evaluasi menggunakan accuracy_score & classification_report, lalu uji prediksi pada data baru (contoh: soil_moisture=25, temperature=32).\n\nCATATAN LAPANGAN:\nBatas kelembapan pada praktikum adalah contoh latihan; penerapan nyata wajib menggunakan kalibrasi sensor serta menyesuaikan jenis tanah dan tanaman.',
+                            category: 'Belajar',
+                            pinned: false,
+                            updatedAt: now - 2000
+                        },
+                        {
+                            id: 'ppt5-tugas-minggu13',
+                            title: 'Tugas Mahasiswa Minggu 13 — Smart Agriculture',
+                            content: 'PILIHAN TOPIK (Pilih salah satu):\n1. Prediksi kelembapan tanah\n2. Klasifikasi kondisi tanah\n3. Deteksi anomali data sensor\n\nKETENTUAN PENGERJAAN:\n• Kerjakan menggunakan Google Colab dan Python.\n• Kumpulkan: Dataset, Source Code, Hasil Training/Testing, Evaluasi Model, Interpretasi hasil, serta Rekomendasi Keputusan Pertanian.\n• Wajib menjelaskan keterbatasan data serta risiko penggunaan hasil model pada lahan pertanian nyata.',
+                            category: 'Belajar',
+                            pinned: false,
+                            updatedAt: now - 3000
+                        }
+                    ];
+
+                    const existingIds = new Set(notes.map(n => n.id));
+                    const toAdd = ppt5Notes.filter(n => !existingIds.has(n.id));
+                    notes = [...toAdd, ...notes];
+                    localStorage.setItem('notaku_ppt5_imported', 'true');
+                    newlyImported = true;
+                }
+
+                saveNotesToStorage();
+            } catch (error) {
+                console.error('Gagal memuat catatan:', error);
+                notes = [];
+            }
+            return newlyImported;
+        }
+
+        function saveNotesToStorage() {
+            try {
+                localStorage.setItem('notaku_notes', JSON.stringify(notes));
+                updateCounts();
+            } catch (error) {
+                showToast('Gagal menyimpan data ke penyimpanan browser.');
+            }
+        }
+
+        // --- Render Daftar Catatan ---
+        function renderNotes() {
+            const grid = document.getElementById('notesGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Filter catatan
+            let filtered = notes.filter(note => {
+                const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      note.content.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                if (!matchesSearch) return false;
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'pinned') return note.pinned;
+                return note.category === currentFilter;
+            });
+
+            // Urutkan catatan (yang di-pin selalu di atas kecuali di-filter khusus)
+            filtered.sort((a, b) => {
+                if (a.pinned !== b.pinned) return b.pinned ? 1 : -1;
+                if (sortBy === 'newest') return b.updatedAt - a.updatedAt;
+                if (sortBy === 'oldest') return a.updatedAt - b.updatedAt;
+                if (sortBy === 'az') return (a.title || 'Tanpa Judul').localeCompare(b.title || 'Tanpa Judul');
+                return 0;
+            });
+
+            updateCounts();
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+            grid.classList.remove('hidden');
+
+            grid.innerHTML = filtered.map(note => {
+                const badgeClass = categoryColors[note.category] || 'bg-slate-100 text-slate-600';
+                const dateStr = formatDate(note.updatedAt);
+                const displayTitle = escapeHTML(note.title) || '<span class="text-slate-400 italic">Tanpa Judul</span>';
+                const displayContent = escapeHTML(note.content) || '<span class="text-slate-400 italic">Tidak ada isi catatan...</span>';
+
+                return `
+                    <article onclick="openEditor('${note.id}')" 
+                        class="group bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-primary-400 dark:hover:border-primary-500/60 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between h-56 relative">
+                        
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                <span class="text-xs font-medium px-2.5 py-1 rounded-lg ${badgeClass}">
+                                    ${note.category}
+                                </span>
+                                <div class="flex items-center gap-1">
+                                    ${note.pinned ? `<span class="text-primary-600 dark:text-primary-400 p-1" title="Disematkan"><i data-lucide="pin" class="w-3.5 h-3.5 fill-current"></i></span>` : ''}
+                                    <button onclick="event.stopPropagation(); promptDelete('${note.id}')" 
+                                        class="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all" title="Hapus">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <h3 class="font-bold text-base text-slate-800 dark:text-slate-100 line-clamp-1 mb-2">
+                                ${displayTitle}
+                            </h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-4 whitespace-pre-line leading-relaxed">
+                                ${displayContent}
+                            </p>
+                        </div>
+
+                        <div class="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                            <span>${dateStr}</span>
+                            <span class="group-hover:text-primary-600 dark:group-hover:text-primary-400 font-medium transition-colors">Buka →</span>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function updateCounts() {
+            document.getElementById('count-all').textContent = notes.length;
+            document.getElementById('count-pinned').textContent = notes.filter(n => n.pinned).length;
+            ['Pribadi', 'Pekerjaan', 'Ide', 'Belajar'].forEach(cat => {
+                const el = document.getElementById(`count-${cat}`);
+                if (el) el.textContent = notes.filter(n => n.category === cat).length;
+            });
+        }
+
+        // --- Editor Catatan ---
+        function openEditor(id = null) {
+            const modal = document.getElementById('editorModal');
+            const titleInput = document.getElementById('noteTitle');
+            const contentInput = document.getElementById('noteContent');
+            const categorySelect = document.getElementById('noteCategory');
+            const deleteBtn = document.getElementById('deleteNoteBtn');
+
+            if (id) {
+                const note = notes.find(n => n.id === id);
+                if (!note) return;
+                activeNoteId = note.id;
+                titleInput.value = note.title;
+                contentInput.value = note.content;
+                categorySelect.value = note.category;
+                updatePinButtonUI(note.pinned);
+                deleteBtn.classList.remove('hidden');
+            } else {
+                // Buat catatan baru langsung
+                const newNote = {
+                    id: Date.now().toString(),
+                    title: '',
+                    content: '',
+                    category: ['Pribadi', 'Pekerjaan', 'Ide', 'Belajar'].includes(currentFilter) ? currentFilter : 'Pribadi',
+                    pinned: false,
+                    updatedAt: Date.now()
+                };
+                notes.unshift(newNote);
+                activeNoteId = newNote.id;
+                titleInput.value = '';
+                contentInput.value = '';
+                categorySelect.value = newNote.category;
+                updatePinButtonUI(false);
+                deleteBtn.classList.remove('hidden');
+                saveNotesToStorage();
+            }
+
+            updateWordCount();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            titleInput.focus();
+            lucide.createIcons();
+        }
+
+        function closeEditor() {
+            const modal = document.getElementById('editorModal');
+            resetAiUI();
+            // Hapus catatan jika benar-benar kosong saat ditutup
+            if (activeNoteId) {
+                const idx = notes.findIndex(n => n.id === activeNoteId);
+                if (idx !== -1 && !notes[idx].title.trim() && !notes[idx].content.trim()) {
+                    notes.splice(idx, 1);
+                    saveNotesToStorage();
+                }
+            }
+            activeNoteId = null;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            renderNotes();
+        }
+
+        function handleAutoSave() {
+            if (!activeNoteId) return;
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note) return;
+
+            note.title = document.getElementById('noteTitle').value;
+            note.content = document.getElementById('noteContent').value;
+            note.category = document.getElementById('noteCategory').value;
+            note.updatedAt = Date.now();
+
+            updateWordCount();
+            saveNotesToStorage();
+
+            const saveStatus = document.getElementById('saveStatus');
+            saveStatus.innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i> Tersimpan otomatis`;
+            lucide.createIcons();
+        }
+
+        function updatePinButtonUI(isPinned) {
+            const btn = document.getElementById('togglePinBtn');
+            if (isPinned) {
+                btn.classList.add('bg-primary-100', 'border-primary-400', 'text-amber-700', 'dark:bg-primary-500/20', 'dark:border-primary-500/50', 'dark:text-primary-300');
+                btn.classList.remove('text-slate-500', 'border-slate-200', 'dark:border-slate-700');
+            } else {
+                btn.classList.remove('bg-primary-100', 'border-primary-400', 'text-amber-700', 'dark:bg-primary-500/20', 'dark:border-primary-500/50', 'dark:text-primary-300');
+                btn.classList.add('text-slate-500', 'border-slate-200', 'dark:border-slate-700');
+            }
+        }
+
+        function togglePin() {
+            if (!activeNoteId) return;
+            const note = notes.find(n => n.id === activeNoteId);
+            if (!note) return;
+
+            note.pinned = !note.pinned;
+            note.updatedAt = Date.now();
+            updatePinButtonUI(note.pinned);
+            saveNotesToStorage();
+            showToast(note.pinned ? 'Catatan disematkan di atas' : 'Sematan catatan dilepas');
+        }
+
+        function updateWordCount() {
+            const text = document.getElementById('noteContent').value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            const chars = document.getElementById('noteContent').value.length;
+            document.getElementById('wordCount').textContent = `${words} kata • ${chars} karakter`;
+        }
+
+        function copyNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            const fullText = title ? `${title}\n\n${content}` : content;
+
+            if (!fullText) {
+                showToast('Tidak ada teks untuk disalin');
+                return;
+            }
+
+            const tempArea = document.createElement('textarea');
+            tempArea.value = fullText;
+            tempArea.style.position = 'fixed';
+            tempArea.style.opacity = '0';
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Catatan disalin ke clipboard');
+            } catch (err) {
+                showToast('Gagal menyalin teks');
+            }
+            document.body.removeChild(tempArea);
+        }
+
+        function downloadNote() {
+            const title = document.getElementById('noteTitle').value.trim() || 'Catatan-NotaKu';
+            const content = document.getElementById('noteContent').value;
+            const blob = new Blob([`${title}\n${'='.repeat(title.length)}\n\n${content}`], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title.replace(/[^a-z0-9\-_\s]/gi, '').trim() || 'catatan'}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Catatan diunduh sebagai file .txt');
+        }
+
+        function promptDelete(id) {
+            noteToDeleteId = id;
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeConfirmModal() {
+            noteToDeleteId = null;
+            const modal = document.getElementById('confirmModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function executeDelete() {
+            if (!noteToDeleteId) return;
+            notes = notes.filter(n => n.id !== noteToDeleteId);
+            saveNotesToStorage();
+
+            const deletedWasActive = activeNoteId === noteToDeleteId;
+            closeConfirmModal();
+
+            if (deletedWasActive) {
+                activeNoteId = null;
+                resetAiUI();
+                const editorModal = document.getElementById('editorModal');
+                editorModal.classList.add('hidden');
+                editorModal.classList.remove('flex');
+            }
+
+            renderNotes();
+            showToast('Catatan berhasil dihapus');
+        }
+
+        // --- Navigasi Sidebar Mobile & Filter ---
+        function openMobileSidebar() {
+            document.getElementById('sidebar').classList.remove('-translate-x-full');
+            document.getElementById('sidebarOverlay').classList.remove('hidden');
+        }
+
+        function closeMobileSidebar() {
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebarOverlay').classList.add('hidden');
+        }
+
+        function updateFilterUI(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const isActive = btn.dataset.filter === filter;
+                if (isActive) {
+                    btn.classList.add('bg-primary-50', 'text-primary-700', 'dark:bg-primary-500/10', 'dark:text-primary-400');
+                    btn.classList.remove('text-slate-600', 'dark:text-slate-400', 'hover:bg-slate-100', 'dark:hover:bg-slate-800/60');
+                } else {
+                    btn.classList.remove('bg-primary-50', 'text-primary-700', 'dark:bg-primary-500/10', 'dark:text-primary-400');
+                    btn.classList.add('text-slate-600', 'dark:text-slate-400', 'hover:bg-slate-100', 'dark:hover:bg-slate-800/60');
+                }
+            });
+
+            const titles = {
+                'all': ['Semua Catatan', 'Kelola ide dan catatan harian Anda di satu tempat'],
+                'pinned': ['Catatan Disematkan', 'Akses cepat untuk catatan prioritas Anda'],
+                'Pribadi': ['Kategori: Pribadi', 'Catatan harian, jurnal, dan pengingat pribadi'],
+                'Pekerjaan': ['Kategori: Pekerjaan', 'Rapat, proyek, dan tugas profesional'],
+                'Ide': ['Kategori: Ide & Kreatif', 'Brainstorming, konsep, dan inspirasi baru'],
+                'Belajar': ['Kategori: Belajar', 'Ringkasan materi kuliah, kursus, dan riset']
+            };
+            const [title, subtitle] = titles[filter] || ['Semua Catatan', ''];
+            document.getElementById('currentViewTitle').textContent = title;
+            document.getElementById('currentViewSubtitle').textContent = subtitle;
+            renderNotes();
+        }
+
+        // --- Setup Event Listeners ---
+        function setupEventListeners() {
+            // Tema
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+            // Sidebar Mobile
+            document.getElementById('openSidebarBtn').addEventListener('click', openMobileSidebar);
+            document.getElementById('closeSidebarBtn').addEventListener('click', closeMobileSidebar);
+            document.getElementById('sidebarOverlay').addEventListener('click', closeMobileSidebar);
+
+            // Filter Kategori
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    updateFilterUI(btn.dataset.filter);
+                    closeMobileSidebar();
+                });
+            });
+
+            // Pencarian & Urutan
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderNotes();
+            });
+            document.getElementById('sortSelect').addEventListener('change', (e) => {
+                sortBy = e.target.value;
+                renderNotes();
+            });
+
+            // Tombol Buat Baru
+            document.getElementById('newNoteBtn').addEventListener('click', () => {
+                closeMobileSidebar();
+                openEditor();
+            });
+            document.getElementById('mobileNewNoteBtn').addEventListener('click', () => openEditor());
+
+            // Tombol Buat Catatan dengan Gemini AI
+            document.getElementById('aiMagicNoteBtn').addEventListener('click', () => {
+                closeMobileSidebar();
+                openAiMagicNote();
+            });
+            document.getElementById('mobileAiNoteBtn').addEventListener('click', () => openAiMagicNote());
+
+            // Fitur Gemini AI di Editor
+            document.querySelectorAll('.ai-action-btn').forEach(btn => {
+                btn.addEventListener('click', () => runAiAction(btn.dataset.aiAction));
+            });
+            document.getElementById('toggleCustomPromptBtn').addEventListener('click', () => {
+                const bar = document.getElementById('aiCustomPromptBar');
+                bar.classList.toggle('hidden');
+                if (!bar.classList.contains('hidden')) {
+                    document.getElementById('aiCustomPromptInput').focus();
+                }
+            });
+            document.getElementById('sendCustomPromptBtn').addEventListener('click', () => {
+                const promptInput = document.getElementById('aiCustomPromptInput');
+                if (promptInput.value.trim()) {
+                    runAiAction('custom', promptInput.value.trim());
+                } else {
+                    showToast('Tuliskan perintah untuk Gemini AI terlebih dahulu');
+                    promptInput.focus();
+                }
+            });
+            document.getElementById('aiCustomPromptInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('sendCustomPromptBtn').click();
+                }
+            });
+            document.getElementById('dismissAiPreviewBtn').addEventListener('click', () => {
+                document.getElementById('aiPreviewBox').classList.add('hidden');
+            });
+            document.getElementById('appendAiResultBtn').addEventListener('click', () => {
+                const aiText = document.getElementById('aiPreviewContent').textContent;
+                const contentEl = document.getElementById('noteContent');
+                contentEl.value = contentEl.value.trim() ? `${contentEl.value.trim()}\n\n${aiText}` : aiText;
+                document.getElementById('aiPreviewBox').classList.add('hidden');
+                handleAutoSave();
+                showToast('Hasil AI disisipkan ke catatan');
+            });
+            document.getElementById('replaceAiResultBtn').addEventListener('click', () => {
+                const aiText = document.getElementById('aiPreviewContent').textContent;
+                document.getElementById('noteContent').value = aiText;
+                document.getElementById('aiPreviewBox').classList.add('hidden');
+                handleAutoSave();
+                showToast('Isi catatan diperbarui dengan hasil AI');
+            });
+
+            // Editor Events
+            document.getElementById('closeEditorBtn').addEventListener('click', closeEditor);
+            document.getElementById('noteTitle').addEventListener('input', handleAutoSave);
+            document.getElementById('noteContent').addEventListener('input', handleAutoSave);
+            document.getElementById('noteCategory').addEventListener('change', handleAutoSave);
+            document.getElementById('togglePinBtn').addEventListener('click', togglePin);
+            document.getElementById('copyNoteBtn').addEventListener('click', copyNote);
+            document.getElementById('downloadNoteBtn').addEventListener('click', downloadNote);
+            document.getElementById('deleteNoteBtn').addEventListener('click', () => {
+                if (activeNoteId) promptDelete(activeNoteId);
+            });
+
+            // Modal Konfirmasi Hapus
+            document.getElementById('cancelDeleteBtn').addEventListener('click', closeConfirmModal);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', executeDelete);
+
+            // Tutup modal saat klik area luar
+            document.getElementById('editorModal').addEventListener('click', (e) => {
+                if (e.target.id === 'editorModal') closeEditor();
+            });
+            document.getElementById('confirmModal').addEventListener('click', (e) => {
+                if (e.target.id === 'confirmModal') closeConfirmModal();
+            });
+            document.getElementById('pwaModal').addEventListener('click', (e) => {
+                if (e.target.id === 'pwaModal') closePwaModal();
+            });
+
+            // Event PWA & Ekspor Ikon
+            document.getElementById('openPwaModalBtn').addEventListener('click', () => {
+                closeMobileSidebar();
+                const modal = document.getElementById('pwaModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                lucide.createIcons();
+            });
+            document.getElementById('closePwaModalBtn').addEventListener('click', closePwaModal);
+            document.getElementById('installPwaBtn').addEventListener('click', triggerPwaInstall);
+            document.getElementById('downloadIconBtn').addEventListener('click', downloadAppIconPng);
+            document.getElementById('downloadManifestBtn').addEventListener('click', downloadManifestJson);
+            document.getElementById('downloadSwBtn').addEventListener('click', downloadServiceWorkerJs);
+        }
+
+        // --- Utilitas ---
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        let toastTimeout;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // --- Integrasi Gemini AI ---
+        let isAiProcessing = false;
+
+        function resetAiUI() {
+            document.getElementById('aiCustomPromptBar').classList.add('hidden');
+            document.getElementById('aiCustomPromptInput').value = '';
+            document.getElementById('aiLoadingIndicator').classList.add('hidden');
+            document.getElementById('aiPreviewBox').classList.add('hidden');
+            document.getElementById('aiPreviewContent').textContent = '';
+        }
+
+        function openAiMagicNote() {
+            openEditor();
+            const bar = document.getElementById('aiCustomPromptBar');
+            const input = document.getElementById('aiCustomPromptInput');
+            bar.classList.remove('hidden');
+            input.placeholder = 'Topik catatan baru (misal: Rangkuman sistem irigasi pintar berbasis IoT)...';
+            input.focus();
+        }
+
+        function setAiLoading(loading, message = 'Gemini AI sedang memproses catatan Anda...') {
+            isAiProcessing = loading;
+            const loader = document.getElementById('aiLoadingIndicator');
+            const loaderText = document.getElementById('aiLoadingText');
+            const actionBtns = document.querySelectorAll('.ai-action-btn, #sendCustomPromptBtn');
+
+            loaderText.textContent = message;
+            if (loading) {
+                loader.classList.remove('hidden');
+                document.getElementById('aiPreviewBox').classList.add('hidden');
+                actionBtns.forEach(b => {
+                    b.disabled = true;
+                    b.classList.add('opacity-50', 'cursor-not-allowed');
+                });
+            } else {
+                loader.classList.add('hidden');
+                actionBtns.forEach(b => {
+                    b.disabled = false;
+                    b.classList.remove('opacity-50', 'cursor-not-allowed');
+                });
+            }
+        }
+
+        async function callGeminiAPI(userQuery, systemPrompt, generationConfig = null) {
+            throw new Error('Fitur Gemini AI sementara dinonaktifkan demi keamanan. API key harus digunakan melalui server/backend yang aman, bukan ditanam di HTML publik.');
+        }
+
+        async function runAiAction(actionType, customPrompt = '') {
+            if (isAiProcessing) return;
+
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+
+            if (['summarize', 'polish', 'todos', 'autotitle'].includes(actionType) && !content) {
+                showToast('Tulis isi catatan terlebih dahulu sebelum menggunakan fitur ini');
+                return;
+            }
+
+            if (actionType === 'continue' && !title && !content) {
+                showToast('Isi judul atau beberapa kalimat awal terlebih dahulu');
+                return;
+            }
+
+            const systemPrompt = 'Anda adalah asisten catatan digital pintar bernama NotaKu AI. Gunakan bahasa Indonesia yang natural, jelas, rapi, dan langsung ke inti pembahasan tanpa basa-basi pembuka atau penutup.';
+            let userQuery = '';
+            let loadingMsg = 'Gemini AI sedang memproses catatan Anda...';
+
+            switch (actionType) {
+                case 'summarize':
+                    loadingMsg = 'Meringkas poin-poin penting catatan...';
+                    userQuery = `Ringkas catatan berikut menjadi poin-poin penting yang padat, terstruktur, dan mudah dipahami:\n\nJudul: ${title || '(Tanpa Judul)'}\nIsi:\n${content}`;
+                    break;
+                case 'polish':
+                    loadingMsg = 'Merapikan struktur dan tata bahasa...';
+                    userQuery = `Perbaiki ejaan, tata bahasa, serta rapikan struktur paragraf dan poin-poin pada catatan berikut tanpa mengubah makna aslinya:\n\n${content}`;
+                    break;
+                case 'continue':
+                    loadingMsg = 'Melanjutkan penulisan catatan...';
+                    userQuery = `Lanjutkan tulisan catatan berikut secara relevan, informatif, dan selaras dengan gaya bahasa yang sudah ada:\n\nJudul: ${title || '(Tanpa Judul)'}\nIsi saat ini:\n${content}`;
+                    break;
+                case 'todos':
+                    loadingMsg = 'Mengekstrak daftar tugas (To-Do)...';
+                    userQuery = `Ekstrak semua tindakan, tugas, atau langkah yang perlu dilakukan dari catatan berikut dalam format daftar periksa menggunakan simbol "☐ " di setiap baris:\n\nJudul: ${title || '(Tanpa Judul)'}\nIsi:\n${content}`;
+                    break;
+                case 'autotitle':
+                    loadingMsg = 'Membuat judul & menentukan kategori...';
+                    userQuery = `Buatkan satu judul singkat (maksimal 8 kata) yang paling tepat dan pilih satu kategori paling sesuai ("Pribadi", "Pekerjaan", "Ide", atau "Belajar") untuk isi catatan berikut:\n\n${content}`;
+                    break;
+                case 'custom':
+                    loadingMsg = 'Gemini AI sedang menyusun jawaban...';
+                    userQuery = content
+                        ? `Instruksi pengguna: ${customPrompt}\n\nKonteks catatan saat ini:\nJudul: ${title || '(Tanpa Judul)'}\nIsi:\n${content}`
+                        : `Buatkan catatan lengkap, terstruktur, dan mudah dibaca berdasarkan perintah berikut: ${customPrompt}`;
+                    break;
+            }
+
+            setAiLoading(true, loadingMsg);
+
+            try {
+                if (actionType === 'autotitle') {
+                    const schemaConfig = {
+                        responseMimeType: 'application/json',
+                        responseSchema: {
+                            type: 'OBJECT',
+                            properties: {
+                                title: { type: 'STRING' },
+                                category: {
+                                    type: 'STRING',
+                                    enum: ['Pribadi', 'Pekerjaan', 'Ide', 'Belajar']
+                                }
+                            },
+                            required: ['title', 'category']
+                        }
+                    };
+                    const rawJson = await callGeminiAPI(userQuery, systemPrompt, schemaConfig);
+                    const parsed = JSON.parse(rawJson);
+
+                    if (parsed.title) {
+                        document.getElementById('noteTitle').value = parsed.title;
+                    }
+                    if (parsed.category && ['Pribadi', 'Pekerjaan', 'Ide', 'Belajar'].includes(parsed.category)) {
+                        document.getElementById('noteCategory').value = parsed.category;
+                    }
+                    handleAutoSave();
+                    showToast(`Judul & kategori (${parsed.category}) berhasil diperbarui!`);
+                } else {
+                    const generatedText = await callGeminiAPI(userQuery, systemPrompt);
+                    const previewBox = document.getElementById('aiPreviewBox');
+                    const previewContent = document.getElementById('aiPreviewContent');
+
+                    previewContent.textContent = generatedText.trim();
+                    previewBox.classList.remove('hidden');
+
+                    // Jika catatan baru dari perintah kustom dan judul masih kosong, bantu isi judul dari perintah
+                    if (actionType === 'custom' && !title && customPrompt) {
+                        const cleanTitle = customPrompt.replace(/^(buatkan|buat|tulis|tuliskan)\s+(catatan\s+)?(tentang\s+)?/i, '');
+                        document.getElementById('noteTitle').value = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+                        handleAutoSave();
+                    }
+                    lucide.createIcons();
+                }
+            } catch (error) {
+                showToast('Gagal terhubung ke Gemini AI. Silakan coba lagi.');
+            } finally {
+                setAiLoading(false);
+            }
+        }
+
+        // --- Konfigurasi PWA (Ikon Dinamis, Web App Manifest & Service Worker) ---
+        let deferredInstallPrompt = null;
+        let generatedIcon512Blob = null;
+        let generatedIcon512Url = '';
+        let generatedManifestText = '';
+        let generatedSwText = '';
+
+        function renderAppIconCanvas(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const s = size / 120;
+
+            ctx.save();
+            ctx.scale(s, s);
+
+            // 1. Squircle Gradient Emas
+            const bgGrad = ctx.createLinearGradient(0, 0, 120, 120);
+            bgGrad.addColorStop(0, '#fde047');
+            bgGrad.addColorStop(0.5, '#eab308');
+            bgGrad.addColorStop(1, '#d97706');
+            drawRoundedRect(ctx, 0, 0, 120, 120, 28);
+            ctx.fillStyle = bgGrad;
+            ctx.fill();
+
+            // 2. Tumpukan Halaman Buku Catatan
+            drawRoundedRect(ctx, 27, 31, 56, 68, 9);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fill();
+
+            drawRoundedRect(ctx, 25, 28, 56, 68, 9);
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fill();
+
+            drawRoundedRect(ctx, 23, 25, 56, 68, 9);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+
+            // 3. Ring Spiral Emas
+            ctx.strokeStyle = '#b45309';
+            ctx.lineWidth = 3.5;
+            ctx.lineCap = 'round';
+            [32, 41, 50, 59, 68].forEach(rx => {
+                ctx.beginPath();
+                ctx.moveTo(rx, 20);
+                ctx.lineTo(rx, 29);
+                ctx.stroke();
+            });
+
+            // 4. Inisial "N" & Garis Teks
+            ctx.fillStyle = '#78350f';
+            ctx.font = 'bold 22px Georgia, serif';
+            ctx.fillText('N', 32, 51);
+
+            ctx.fillStyle = '#94a3b8';
+            drawRoundedRect(ctx, 54, 38, 17, 3.5, 1.75);
+            ctx.fill();
+
+            ctx.fillStyle = '#cbd5e1';
+            drawRoundedRect(ctx, 54, 45, 13, 3.5, 1.75);
+            ctx.fill();
+            drawRoundedRect(ctx, 32, 60, 38, 3.5, 1.75);
+            ctx.fill();
+            drawRoundedRect(ctx, 32, 68, 28, 3.5, 1.75);
+            ctx.fill();
+
+            ctx.fillStyle = '#e2e8f0';
+            drawRoundedRect(ctx, 32, 76, 22, 3.5, 1.75);
+            ctx.fill();
+
+            // 5. Kilauan AI Sparkles
+            drawSparkle(ctx, 84, 27, 9, '#fef9c3');
+            drawSparkle(ctx, 97, 37.5, 5.5, '#fef08a');
+
+            // 6. Pena Stylus Cerdas
+            ctx.save();
+            ctx.translate(86, 52);
+            ctx.rotate((38 * Math.PI) / 180);
+
+            const penGrad = ctx.createLinearGradient(-5.5, -26, 5.5, 18);
+            penGrad.addColorStop(0, '#334155');
+            penGrad.addColorStop(1, '#0f172a');
+            drawRoundedRect(ctx, -5.5, -26, 11, 44, 5.5);
+            ctx.fillStyle = penGrad;
+            ctx.fill();
+
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(-5.5, -16, 11, 3);
+            drawRoundedRect(ctx, -2, -6, 4, 12, 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(-5.5, 18);
+            ctx.lineTo(5.5, 18);
+            ctx.lineTo(0, 29);
+            ctx.closePath();
+            ctx.fillStyle = '#eab308';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(0, 30, 3.5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(254, 249, 195, 0.9)';
+            ctx.fill();
+            ctx.restore();
+
+            ctx.restore();
+            return canvas;
+        }
+
+        function drawRoundedRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+
+        function drawSparkle(ctx, cx, cy, r, color) {
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - r);
+            ctx.lineTo(cx + r * 0.28, cy - r * 0.28);
+            ctx.lineTo(cx + r, cy);
+            ctx.lineTo(cx + r * 0.28, cy + r * 0.28);
+            ctx.lineTo(cx, cy + r);
+            ctx.lineTo(cx - r * 0.28, cy + r * 0.28);
+            ctx.lineTo(cx - r, cy);
+            ctx.lineTo(cx - r * 0.28, cy - r * 0.28);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function canvasToPngBlob(canvas) {
+            return new Promise(resolve => {
+                canvas.toBlob(blob => resolve(blob), 'image/png');
+            });
+        }
+
+        async function initPWA() {
+            try {
+                const iconResponse = await fetch('./icon-512.png');
+                if (iconResponse.ok) generatedIcon512Blob = await iconResponse.blob();
+                generatedIcon512Url = './icon-512.png';
+                const preview = document.getElementById('pwaIconPreview');
+                if (preview) preview.src = generatedIcon512Url;
+
+                const manifestObj = {
+                    name: 'NotaKu - Aplikasi Catatan Digital',
+                    short_name: 'NotaKu',
+                    description: 'Aplikasi catatan digital pribadi dengan penyimpanan lokal.',
+                    start_url: './index.html',
+                    scope: './',
+                    display: 'standalone',
+                    orientation: 'portrait-primary',
+                    background_color: '#0f172a',
+                    theme_color: '#eab308',
+                    icons: [
+                        { src: './icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+                        { src: './icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+                    ]
+                };
+                generatedManifestText = JSON.stringify(manifestObj, null, 2);
+                generatedSwText = `const CACHE_NAME = 'notaku-pwa-v1';
+const APP_ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_ASSETS)));
+  self.skipWaiting();
+});
+self.addEventListener('activate', event => {
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
+    if (response && response.ok) { const copy = response.clone(); caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy)); }
+    return response;
+  }).catch(() => caches.match('./index.html'))));
+});`;
+
+                const swBadge = document.getElementById('swStatusBadge');
+                const swDot = document.getElementById('swStatusDot');
+                if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+                    try {
+                        await navigator.serviceWorker.register('./sw.js', { scope: './' });
+                        swBadge.textContent = 'Aktif (Offline Ready)';
+                        swBadge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400 font-semibold';
+                        swDot.className = 'w-2 h-2 rounded-full bg-emerald-500 shrink-0';
+                    } catch (swErr) {
+                        swBadge.textContent = 'Gagal mengaktifkan';
+                        swDot.className = 'w-2 h-2 rounded-full bg-rose-500 shrink-0';
+                    }
+                } else {
+                    swBadge.textContent = 'Siap (Butuh HTTPS/Host)';
+                    swDot.className = 'w-2 h-2 rounded-full bg-amber-500 shrink-0';
+                }
+
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredInstallPrompt = e;
+                    const installBtn = document.getElementById('installPwaBtn');
+                    installBtn.classList.remove('hidden');
+                    installBtn.classList.add('flex');
+                });
+                window.addEventListener('appinstalled', () => {
+                    deferredInstallPrompt = null;
+                    document.getElementById('installPwaBtn').classList.add('hidden');
+                    showToast('NotaKu berhasil diinstal ke perangkat!');
+                });
+            } catch (err) {
+                console.error('Inisialisasi PWA:', err);
+            }
+        }
+
+        async function triggerPwaInstall() {
+            if (!deferredInstallPrompt) {
+                showToast('Gunakan menu Chrome (⋮) → Tambahkan ke layar utama');
+                return;
+            }
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                deferredInstallPrompt = null;
+                document.getElementById('installPwaBtn').classList.add('hidden');
+            }
+        }
+
+        function closePwaModal() {
+            const modal = document.getElementById('pwaModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function triggerBlobDownload(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadAppIconPng() {
+            if (!generatedIcon512Blob) return;
+            triggerBlobDownload(generatedIcon512Blob, 'icon-512.png');
+            showToast('Ikon aplikasi (icon-512.png) diunduh');
+        }
+
+        function downloadManifestJson() {
+            const blob = new Blob([generatedManifestText], { type: 'application/manifest+json' });
+            triggerBlobDownload(blob, 'manifest.json');
+            showToast('File manifest.json diunduh');
+        }
+
+        function downloadServiceWorkerJs() {
+            const blob = new Blob([generatedSwText], { type: 'application/javascript' });
+            triggerBlobDownload(blob, 'sw.js');
+            showToast('File sw.js diunduh');
+        }
+    </script>
+</body>
+</html>

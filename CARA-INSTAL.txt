@@ -1,0 +1,16 @@
+NOTAKU – PWA
+
+Paket ini siap diunggah ke GitHub Pages atau Netlify.
+
+File utama:
+- index.html: aplikasi NotaKu
+- manifest.json: identitas PWA
+- sw.js: cache dasar/offline
+- icon-192.png dan icon-512.png: ikon aplikasi
+
+PENTING:
+- Fitur Gemini AI dinonaktifkan pada paket publik karena HTML awal berisi API key langsung di browser. Jangan memasukkan API key ke file HTML publik. Jika ingin mengaktifkan AI, gunakan backend/proxy aman.
+- Catatan disimpan di localStorage browser/perangkat. Data tidak otomatis tersinkron antarperangkat dan dapat hilang jika data situs/browser dihapus.
+- Tailwind, Lucide, dan Google Fonts masih dimuat dari CDN; koneksi internet diperlukan untuk sebagian tampilan/ikon/font.
+
+Deploy: unggah seluruh isi folder ini ke root repository GitHub Pages, atau drag-and-drop folder ke layanan hosting statis yang mendukung HTTPS.
